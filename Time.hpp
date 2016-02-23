@@ -67,7 +67,10 @@ public:
         this->week_day = t.week_day;
     }
 
-    /* 导出格式化字符串 */
+    /**
+     * @brief 导出格式化字符串
+     * @format 年-月-日 时:分:秒.毫秒
+     */
     inline string to_string()const{
         string s;
         char buf[25];

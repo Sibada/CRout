@@ -12,37 +12,35 @@ using namespace std;
 
 void make_UHm(Matrix<double>* UH_m,
               Grid<double>* veloc,Grid<double>* diffu,Grid<double>* distan,
-              int nrow,int ncol)
+              Matrix<int>* basin,int basin_sum)
 {
-    for(int x = 1; x <= ncol; x++)
-        for(int y = 1; y <= nrow; y++){
-            if(distan->get(y,x) < 1)continue;
-            double vel = veloc->get(y,x),
-                    dif = diffu->get(y,x),
-                    dis = distan->get(y,x);
+    for(int num = 1; num <= basin_sum; num++) {
+        int x = basin->get(num, 1);
+        int y = basin->get(num, 2);
+        if (distan->get(y, x) < 1)continue;
+        double vel = veloc->get(y, x),
+                dif = diffu->get(y, x),
+                dis = distan->get(y, x);
 
-            double t = 0.0;
-            for(int k = 1; k <= LE; k++){
-                t += DT;
-                double h =0.0;
-                if(vel > 0.0) {
-                    double pot = pow((vel * t - dis), 2.0) / (4.0 * dif * t);
-                    if (pot <= 69.0)
-                        h = 1.0 / (2.0 * sqrt(PI * dif)) * dis / pow(t, 1.5) * exp(-pot);
-                }
-                UH_m->set(k,x,y,h);
+        double t = 0.0;
+        for (int k = 1; k <= LE; k++) {
+            t += DT;
+            double h = 0.0;
+            if (vel > 0.0) {
+                double pot = pow((vel * t - dis), 2.0) / (4.0 * dif * t);
+                if (pot <= 69.0)
+                    h = 1.0 / (2.0 * sqrt(PI * dif)) * dis / pow(t, 1.5) * exp(-pot);
             }
+            UH_m->set(k, x, y, h);
         }
 
-    for(int x = 1; x <= ncol; x++){
-        for(int y = 1; y <= nrow; y++){
-            double sum = 0.0;
-            for(int k = 1;k <= LE; k++)
-                sum += UH_m->get(k,x,y);
-            if(sum > 0.0)
-                for(int k = 1; k <=LE; k++)
-                    UH_m->set(k,x,y,UH_m->get(k,x,y)/sum);
-        }
+        double sum = 0.0;
+        for(int k = 1;k <= LE; k++)
+            sum += UH_m->get(k,x,y);
+        if(sum > 0.0)
+            for(int k = 1; k <=LE; k++)
+                UH_m->set(k,x,y,UH_m->get(k,x,y)/sum);
+
     }
 
 }
@@ -56,6 +54,9 @@ void make_grid_UH(Matrix<double>* UH_grid,
 
     double UH_daily [basin_sum + 1][DAY_UH+1];
     double UH_hour [T_MAX+1][2];
+
+
+
 
     for(int n = 1;n <= basin_sum; n++){
 

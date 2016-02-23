@@ -44,7 +44,7 @@ int discovery_basin(int ,int , Matrix<int>*,
 
 int read_UH_slope(double*,string);
 
-void make_UHm(Matrix<double>*,Grid<double>*,Grid<double>*,Grid<double>*,int,int);
+void make_UHm(Matrix<double>*,Grid<double>*,Grid<double>*,Grid<double>*,Matrix<int>*, int);
 
 void make_grid_UH(Matrix<double>* UH_grid,
                   Matrix<int>* basin, int basin_sum,
@@ -75,11 +75,11 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
 /**
  * 输出流量信息，精确到日
  */
-int write_file(double * flow, double basin_factor, const Time& start_date, int rout_days,string station_name, string out_path);
+int write_file(double * flow, double basin_factor, const Time& start_date, int skip_days, int rout_days,string station_name, string out_path);
 
 /**
  * 输出流量信息，精确到月份
  */
-int write_file_month(double * flow, double basin_factor, const Time& start_date, int rout_days,string station_name, string out_path);
+int write_file_month(double * flow, double basin_factor, const Time& start_date, int skip_days, int rout_days,string station_name, string out_path);
 
 #endif // CROUT_HPP

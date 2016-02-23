@@ -10,9 +10,13 @@
 #include <time.h>
 
 /**
- * CRout 0.10
- * 2016-02-21
- * SIBADA
+ * VIC汇流程序 CRout
+ * @date 2016-02-21 0.10
+ * @author SIBADA
+ *
+ * 16-02-22 0.11
+ *
+ *
  */
 
 using namespace std;
@@ -51,8 +55,8 @@ int main(int argc, char *argv[]){
     string vic_path;
     string out_path;
 
-    string sdate;
-    string edate;
+    string cacu_time;
+    string output_time;
     string UHslo_path;
 
     int prec = 4;   // VIC输出文件坐标小数位数
@@ -83,14 +87,18 @@ int main(int argc, char *argv[]){
     double xll,yll = 0.0;
     double csize = 0.0;
 
-    Time start_date;
-    Time end_date;
+    Time begin_date, end_date;
+    Time start_date, stop_date;
+
+    int begin_y,begin_m,end_y,end_m;
+    int start_y,start_m,stop_y,stop_m;
     int rout_days;
+    int output_days;
+    int out_skip_days;
 
     int sta = 0; // 状态参数
 
-    /** ******************* 读取全局文件信息 ******************* **/
-
+    /** ******************* 读取输入参数文件信息 ******************* **/
 
     string line;
     do{
@@ -164,9 +172,39 @@ int main(int argc, char *argv[]){
         getline(fin, line);
     }while(line.length() == 0 || line[0] == '#');
 
-    sdate = line + " 01";
+    sta = sscanf(line.c_str(),"%d %d %d %d",&begin_y,&begin_m,&end_y,&end_m);
+    if(sta < 4){
+        cout<<"  错误： 汇流计算时间格式不正确。\n";
+        exit(1);
+    }
     getline(fin,line);
-    edate = line + " 31";    // 汇流起止日期
+    sta = sscanf(line.c_str(),"%d %d %d %d",&start_y,&start_m,&stop_y,&stop_m);   // 汇流起止日期
+    if( sta < 4){
+        cout<<"  错误： 输出时间格式不正确。\n";
+        exit(1);
+    }
+
+    begin_date.set_time(begin_y,begin_m,1);   // 录入汇流起止时间
+    end_date.set_time(end_y,end_m,31);
+
+    rout_days = end_date - begin_date + 1;
+    if(rout_days <= 0) {
+        cout << "  错误： 汇流结束日期" << end_date << "不晚于开始日期" << begin_date << "\n";
+        exit(1);
+    }
+
+    start_date.set_time(start_y,start_m,1);
+    stop_date.set_time(stop_y,stop_m,31);
+    if(start_date < begin_date)start_date = begin_date;
+    if(stop_date > end_date)stop_date = end_date;
+
+    output_days = end_date - start_date;
+    if(output_days <= 0){
+        cout << "  错误： 输出结束日期" << stop_date << "不晚于开始日期" << start_date << "\n";
+        exit(1);
+    }
+
+    out_skip_days = start_date - begin_date;
 
     do{
         getline(fin, line);
@@ -177,22 +215,6 @@ int main(int argc, char *argv[]){
     fin.close();
 
 
-    sta = start_date.set_time(sdate);   // 录入汇流起止时间
-    if(sta != 3){
-        cout<<"  错误： 起始日期格式错误\n";
-        exit(1);
-    }
-    sta = end_date.set_time(edate);
-    if(sta != 3){
-        cout<<"  错误： 结束日期格式错误\n";
-        exit(1);
-    }
-
-    rout_days = end_date - start_date + 1;
-
-    if(rout_days <= 0) {
-        cout<<"  错误： 结束日期"<<end_date<<"不晚于开始日期"<<start_date<<"\n";
-    }
 
     /** ******************** 输出基本信息 ******************** **/
 
@@ -216,9 +238,9 @@ int main(int argc, char *argv[]){
     cout<< "  站点信息文件： " << stnloc_path << endl
         << "  VIC数据位置： " << vic_path << " " << prec << "位小数" << endl
         << "  坡面汇流单位线： " << UHslo_path << endl;
-    cout<<"  汇流起止日期：\n"
-        <<"    "<<start_date.get_date()<<" - "
-        <<end_date.get_date() << endl;
+    cout << "  汇流起止日期：\n"
+    << "    " << begin_date.get_date() << " - "
+    << end_date.get_date() << endl;
 
 
     /** ******************** 读入各文件数据 ******************** **/
@@ -282,7 +304,7 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-    /** ******************** 一些数据预处理 ******************** **/
+    /** ************************* 一些数据预处理 ************************* **/
 
     next_x = new Grid<int>(nrow,ncol);
     next_y = new Grid<int>(nrow,ncol);
@@ -292,9 +314,8 @@ int main(int argc, char *argv[]){
     make_distance(distan,next_x,next_y,xll,yll,csize);
 
     UH_m = new Matrix<double>(LE,ncol,nrow);
-    make_UHm(UH_m,veloc,diffu,distan,nrow,ncol); //
 
-    /** ******************** 流量测站信息并计算流量 ******************** **/
+    /** ********************** 流量测站信息并计算流量 ********************** **/
 
     fin.open(stnloc_path.c_str());
     if(!fin.is_open()){
@@ -312,8 +333,9 @@ int main(int argc, char *argv[]){
     char buf[128];
     while(!fin.eof()){
         fin.getline(buf, 128);
-        if(buf[0] == '\0')
+        if(buf[0] == '\0') {
             break;
+        }
 
         while(buf[0] == '#'){
             fin.getline(buf,128);
@@ -334,7 +356,8 @@ int main(int argc, char *argv[]){
         if(!is_run)continue;    //  跳过设定不运行的站点。
 
         cout<<"———— 站点： "<<station_name<<"， 位置 "<<stn_x<<","<<stn_y<<" ————\n";
-    /** ******************** 数据计算 ******************** **/
+
+        /** *************************** 数据计算 *************************** **/
 
         if(UH_station_path == "NONE"){
             cout<<"  -> 无站点单位线文件，将由程序生成。\n";
@@ -343,6 +366,7 @@ int main(int argc, char *argv[]){
             basin_sum = discovery_basin(stn_x,stn_y,basin,next_x,next_y);
 
             cout<<"     生成站点单位线数据...\n";
+            make_UHm(UH_m,veloc,diffu,distan,basin,basin_sum); //
             make_grid_UH(UH_grid,basin,basin_sum,UH_m,UH_slope,next_x,next_y,stn_x,stn_y);
 
             cout<<"     输出站点单位线文件...\n";
@@ -358,12 +382,12 @@ int main(int argc, char *argv[]){
 
         double flow[rout_days + 1];
         double basin_factor =
-                make_convolution(basin,basin_sum,xll,yll,csize,UH_grid,fract,
-                                 vic_path,prec,start_date,rout_days,flow);
+                make_convolution(basin, basin_sum, xll, yll, csize, UH_grid, fract,
+                                 vic_path, prec, begin_date, rout_days, flow);
 
         cout<<"     输出模拟流量数据...\n";
-        write_file(flow,basin_factor,start_date,rout_days,station_name,out_path);
-        write_file_month(flow,basin_factor,start_date,rout_days,station_name,out_path);
+        write_file(flow, basin_factor, start_date,out_skip_days, rout_days, station_name, out_path);
+        write_file_month(flow, basin_factor, start_date, out_skip_days,rout_days, station_name, out_path);
 
     }
     fin.close();

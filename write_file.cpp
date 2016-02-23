@@ -15,7 +15,7 @@
 
 using namespace std;
 
-int write_file(double * flow, double basin_factor, const Time& start_date, int rout_days,string station_name, string out_path){
+int write_file(double * flow, double basin_factor, const Time& start_date, int skip_days, int rout_days,string station_name, string out_path){
     string fd_path = out_path+station_name+".day";
     string fdmm_path = out_path+station_name+".day_mm";
     Time date = start_date;
@@ -30,7 +30,7 @@ int write_file(double * flow, double basin_factor, const Time& start_date, int r
         return 1;
     }
 
-    for(int i = 1; i <= rout_days; i++){
+    for(int i = skip_days+ 1; i <= rout_days; i++){
         fd << date.get_year()<<"\t"<<date.get_month()<<"\t"<<date.get_day()<<"\t"
         <<flow[i]<<endl;
 
@@ -44,7 +44,7 @@ int write_file(double * flow, double basin_factor, const Time& start_date, int r
     return 0;
 }
 
-int write_file_month(double * flow, double basin_factor, const Time& start_date, int rout_days,string station_name, string out_path){
+int write_file_month(double * flow, double basin_factor, const Time& start_date, int skip_days, int rout_days,string station_name, string out_path){
     string fm_path = out_path+station_name+".month";
     string fmmm_path = out_path+station_name+".month_mm";
     Time date = start_date;
@@ -61,7 +61,7 @@ int write_file_month(double * flow, double basin_factor, const Time& start_date,
 
     double month_avg = 0.0;
 
-    for(int i = 1; i <= rout_days; i++){
+    for(int i = skip_days + 1; i <= rout_days; i++){
         month_avg += flow[i];
 
         if(date.get_day() == date.get_days_in_month()) {
