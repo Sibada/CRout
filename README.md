@@ -28,16 +28,29 @@ F
 ```
 其他格式不变。
 
-使用方式（**Make**方法）：
+
+##使用方式
+###**Make**方法：
+
 在终端中打开源代码目录：`cd .../CRout/src`
+
 编译：`make`
+
 运行：`./crout`
 
-**CMake**方法:
+
+###**CMake**方法:
+
 在终端中打开源代码目录：`cd .../CRout/src`
+
 然后：
+
 `mkdir build`
+
 `cd build`
+
 `cmake ..`
+
 `make`
+
 运行：`./crout`

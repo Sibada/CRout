@@ -107,26 +107,39 @@ int main(int argc, char *argv[]){
     // 跳过注释行
 
     direc_path = line;  // 流向文件路径
+    cout	<< "  流向数据： " << direc_path << endl;
+
 
     do{
         getline(fin, line);
     }while(line.length() == 0 || line[0] == '#');
 
     veloc_path = line;  // 流速文件路径
+    cout    << "  流速数据： " ;
+
     if(veloc_path == "F"){
         getline(fin,line);
         veloc_default = atof(line.c_str());
+        cout<< "取均一值"<<veloc_default<<endl;
     }   // 若无提供读入均一值
+    else cout<<veloc_path<<endl;
+
 
     do{
         getline(fin, line);
     }while(line.length() == 0 || line[0] == '#');
 
     diffu_path = line;  // 扩散值文件路径
+    cout    << "  水力扩散数据： " ;
+
     if(diffu_path == "F"){
         getline(fin,line);
         diffu_default = atof(line.c_str());
+        cout<< "取均一值"<<diffu_default<<endl;
     }
+    else cout<<diffu_path<<endl;
+
+
 
 //    do{
 //        getline(fin, line);
@@ -143,16 +156,23 @@ int main(int argc, char *argv[]){
     }while(line.length() == 0 || line[0] == '#');
 
     fract_path = line;  // 产流比例文件路径
+    cout    << "  产流比例数据： " ;
+
     if(fract_path == "F"){
         getline(fin,line);
         fract_default = atof(line.c_str());
+        cout<< "取均一值"<<fract_default<<endl;
     }
+    else cout<<fract_path<<endl;
+
 
     do{
         getline(fin, line);
     }while(line.length() == 0 || line[0] == '#');
 
     stnloc_path = line;  // 流量站文件路径
+    cout<< "  站点信息文件： " << stnloc_path << endl;
+
 
     do{
         getline(fin, line);
@@ -161,12 +181,16 @@ int main(int argc, char *argv[]){
     vic_path = line;  // VIC输出文件路径
     getline(fin,line);
     prec = atoi(line.c_str());  //VIC输出文件坐标小数位数
+    cout << "  VIC数据位置： " << vic_path << "，  " << prec << "位小数" << endl;
+
 
     do{
         getline(fin, line);
     }while(line.length() == 0 || line[0] == '#');
 
     out_path = line;  // 汇流输出文件路径
+    cout << "  汇流输出文件位置： " << out_path<<endl;
+
 
     do{
         getline(fin, line);
@@ -174,13 +198,13 @@ int main(int argc, char *argv[]){
 
     sta = sscanf(line.c_str(),"%d %d %d %d",&begin_y,&begin_m,&end_y,&end_m);
     if(sta < 4){
-        cout<<"  错误： 汇流计算时间格式不正确。\n";
+        cout<<"  错误： 汇流计算时间格式不正确：" << line << endl;
         exit(1);
     }
     getline(fin,line);
     sta = sscanf(line.c_str(),"%d %d %d %d",&start_y,&start_m,&stop_y,&stop_m);   // 汇流起止日期
     if( sta < 4){
-        cout<<"  错误： 输出时间格式不正确。\n";
+        cout<<"  错误： 数据输出时间格式不正确：" << line << endl;
         exit(1);
     }
 
@@ -200,7 +224,7 @@ int main(int argc, char *argv[]){
 
     output_days = end_date - start_date;
     if(output_days <= 0){
-        cout << "  错误： 输出结束日期" << stop_date << "不晚于开始日期" << start_date << "\n";
+        cout << "  错误： 输出文件结束日期" << stop_date << "不晚于开始日期" << start_date << "\n";
         exit(1);
     }
 
@@ -212,35 +236,12 @@ int main(int argc, char *argv[]){
 
     UHslo_path = line;  // 坡面汇流单位线文件路径
 
-    fin.close();
-
-
-
-    /** ******************** 输出基本信息 ******************** **/
-
-    cout	<< "  流向数据： " << direc_path << endl;
-
-    cout    << "  流速数据： " ;
-    if(veloc_path == "F" )
-        cout<< "取均一值"<<veloc_default<<endl;
-    else cout<<veloc_path<<endl;
-
-     cout    << "  水力扩散数据： " ;
-    if(diffu_path == "F" )
-        cout<< "取均一值"<<diffu_default<<endl;
-    else cout<<diffu_path<<endl;
-
-     cout    << "  产流比例数据： " ;
-    if(fract_path == "F" )
-        cout<< "取均一值"<<fract_default<<endl;
-    else cout<<fract_path<<endl;
-
-    cout<< "  站点信息文件： " << stnloc_path << endl
-        << "  VIC数据位置： " << vic_path << " " << prec << "位小数" << endl
-        << "  坡面汇流单位线： " << UHslo_path << endl;
+    cout << "  坡面汇流单位线： " << UHslo_path << endl;
     cout << "  汇流起止日期：\n"
     << "    " << begin_date.get_date() << " - "
     << end_date.get_date() << endl;
+
+    fin.close();
 
 
     /** ******************** 读入各文件数据 ******************** **/
@@ -355,7 +356,7 @@ int main(int argc, char *argv[]){
 
         if(!is_run)continue;    //  跳过设定不运行的站点。
 
-        cout<<"———— 站点： "<<station_name<<"， 位置 "<<stn_x<<","<<stn_y<<" ————\n";
+        cout<<"———— 站点： "<<station_name<<"， 位置 "<<stn_x<<","<<stn_y<<" ————————————————\n";
 
         /** *************************** 数据计算 *************************** **/
 

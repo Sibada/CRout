@@ -27,6 +27,14 @@
 *.out
 *.app
 
+# 其他乱入
+*.*~
+.idea/
+build/
+
+.gitignore
+.Rhistory
+
 # =========================
 # Operating System Files
 # =========================
