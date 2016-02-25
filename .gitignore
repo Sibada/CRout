@@ -33,7 +33,11 @@
 build/
 
 .gitignore
+.gitattributes
 .Rhistory
+
+*.uh_s
+crout
 
 # =========================
 # Operating System Files

@@ -73,7 +73,7 @@ public:
      */
     inline string to_string()const{
         string s;
-        char buf[25];
+        char buf[32];
         sprintf(buf,"%d-%d-%d %d:%d:%d.%03d ",
                     year,month,day,hour,minute,second,micro_second);
         s = buf;
@@ -212,7 +212,7 @@ public:
     }
 
     friend ostream& operator<<(ostream &os, const Time &t){
-        os<<t.to_string();
+        os<<t.get_date();
         return os;
     }
 
@@ -262,14 +262,14 @@ public:
 
     inline string get_date()const{
         char buf[16];
-        sprintf(buf,"%d年%d月%d日",year,month,day);
+        sprintf(buf,"%d-%d-%d",year,month,day);
         string s = buf;
         return s;
     }
 
     inline string get_time()const{
         char buf[16];
-        sprintf(buf,"%d时%d分%d秒",hour,minute,second);
+        sprintf(buf,"%d:%d:%d",hour,minute,second);
         string s = buf;
         return s;
     }

@@ -24,11 +24,14 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
     double basin_area = 0.0;
     double basin_factor = 0.0;
 
-    for(int i = 1; i<= rout_days; i++)
+    string grid_path;
+
+    for(int i = 1; i<= rout_days; i++) {
         flow[i] = 0.0;
+    }
 
     char vicfile_format[64];
-    sprintf(vicfile_format,"%s%s%d%s%d%s",vic_path.c_str(),"%.",prec,"f_%.",prec,"f");
+    sprintf(vicfile_format,"%s%d%s%d%s","%.",prec,"f_%.",prec,"f");
 
     for(int n = 1; n <= basin_sum; n ++){
 
@@ -40,13 +43,14 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
 
         /** 读入VIC输出数据 **/
 
-        char grid_path[128];
-        sprintf(grid_path,vicfile_format,la,lon);
+        char path_prefix[32];
+        sprintf(path_prefix,vicfile_format,la,lon);
+        grid_path = vic_path + path_prefix;
 
         ifstream fin;
-        fin.open(grid_path);
+        fin.open(grid_path.c_str());
         if(!fin.is_open()){
-            cout<<"    VIC输出文件“"<<grid_path<<"”未找到，相应数值将设为0。\n";
+            cout<<"    VIC output file "<<grid_path<<" not found.\n    corresponding value will be set to zero.\n";
             for(int i = 1; i <= rout_days;i++) {
                 runo[i] = base[i] = 0.0;
             }
@@ -64,7 +68,7 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             get_start.set_time(year,month,day);
 
             if(get_start > start_date){
-                cout<<"  错误： 汇流开始时间"<<start_date<<"早于VIC输出开始时间"<<get_start<<"。\n";
+                cout<<"  Error: Routing begin date"<<start_date<<" earlier than VIC output begin date "<<get_start<<endl;
                 exit(1);
             }
 
@@ -78,13 +82,13 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
                 runo[i] = truno;
                 base[i] = tbase;
                 if(sta <2){
-                    cout<<"  错误： VIC输出文件格式有问题。\n";
+                    cout<<"  Error: VIC output file format incorrect.\n";
                     exit(1);
                 }
                 getline(fin,buf_line);
                 if(fin.eof()) {
                     if(i < rout_days){
-                        cout<<"  错误：VIC输出数据不足。\n";
+                        cout<<"  Error: VIC output data is not enough.\n";
                         exit(1);
                     }
                 }

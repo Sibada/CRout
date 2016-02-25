@@ -139,7 +139,7 @@ int write_UH_grid(string name ,Matrix<double>* UH_grid, Matrix<int>* basin,int b
         fout<<endl;
     }
     fout.close();
-    cout<<"         文件 "<<filename<<" 已保存在程序根目录。\n";
+    cout<<"     -----File "<<filename<<" is in the directory of CRout.\n";
     return 0;
 }
 
@@ -148,7 +148,7 @@ int read_UH_grid(string filename, Matrix<double>* UH_grid, Matrix<int>* basin){
     fin.open(filename.c_str());
     if(!fin.is_open())
     {
-        cout<<"  错误： 找不到站点单位线文件。\n";
+        cout<<"  Error: Station UH file " << filename << " not found.\n";
         exit(1);
     }
 
@@ -176,7 +176,7 @@ int read_UH_grid(string filename, Matrix<double>* UH_grid, Matrix<int>* basin){
             fin>>buf;
             sta = sscanf(buf,"%lf",&ebuf);
             if(sta < 1){
-                cout<< "  错误： 站点单位线文件格式有问题。\n";
+                cout<< "  Error: Station UH file format incorrect.\n";
                 exit(1);
             }
         UH_grid->set(sum,i,ebuf);

@@ -25,7 +25,7 @@ int write_file(double * flow, double basin_factor, const Time& start_date, int s
     fd.open(fd_path.c_str());
     fdmm.open(fdmm_path.c_str());
     if(!fd.is_open() || !fdmm.is_open()){
-        cout<<"   错误： 无法打开输出文件" << fd_path<<endl
+        cout<<"   Error: Output file can't be open: " << fd_path<<endl
         <<"                       "<<fdmm_path<<endl;
         return 1;
     }
@@ -54,7 +54,7 @@ int write_file_month(double * flow, double basin_factor, const Time& start_date,
     fm.open(fm_path.c_str());
     fmmm.open(fmmm_path.c_str());
     if(!fm.is_open() || !fmmm.is_open()){
-        cout<<"   错误： 无法打开输出文件" << fm_path<<endl
+        cout<<"   Error: Output file can't be open: " << fm_path<<endl
             <<"                       "<<fmmm_path<<endl;
         return 1;
     }
