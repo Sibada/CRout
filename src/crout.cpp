@@ -20,6 +20,9 @@
  * 16-02-25 0.12
  * 由于编码问题输出改为英文，处理了buffer长度的问题。
  *
+ * 16-03-04 0.13
+ * 修改了部分文件数据读入方式，输出流量数据单位改为立方米每秒，
+ * 增加了按流向数据编码方式为原版以及ArcInfo形式的编译选项
  */
 
 using namespace std;
@@ -27,7 +30,8 @@ using namespace std;
 int main(int argc, char *argv[]){
 
     if(argc < 2){
-        cout<<"Usage： crout <input parameter file> [<Log output file>}\n";
+        cout<<"Routing program for VIC in C++ (" << DIREC_FORMAT<<")\n";
+        cout<<"Usage： crout <input parameter file> [<Log output file>]\n";
         exit(0);
     }
 
@@ -37,6 +41,10 @@ int main(int argc, char *argv[]){
         cout<<"  Error: input parameter file not found.\n";
         exit(1);
     }
+
+    // debug用
+//    ifstream fin;
+//    fin.open("/home/victi/rout/p_ins.input");
 
     ofstream olog;
     if(argc > 2) {
@@ -48,6 +56,8 @@ int main(int argc, char *argv[]){
         cout<<"  Log file: "<<argv[2]<<endl;
         cout.rdbuf(olog.rdbuf());
     }
+
+    cout<<"CRout Direction format: "<<DIREC_FORMAT<<endl;   // 输出流向数据编码方式
 
     time_t st_time, ed_time;
     time( &st_time);    // 计算程序运行时间。

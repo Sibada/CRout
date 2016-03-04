@@ -116,13 +116,20 @@ int discovery_basin(int stn_x,int stn_y, Matrix<int>* basin,
     int nrow = next_x->get_nrow(),
             ncol = next_x->get_ncol();
 
+    int prevxy[2][5];
+
     int id = 0;
 
     for(int i = 1; i <= nrow; i++)
         for(int j = 1; j<= ncol; j++)
             if(next_x->get(i,j) > 0){
+
+                for(int s = 0; s < 5;s++)
+                    prevxy[0][s] = prevxy[1][s] = -1;
+
                 int x = j, y = i; // 追踪起点
                 while(true){
+
                     if(x == stn_x && y == stn_y){
                         id++;
 
@@ -130,16 +137,34 @@ int discovery_basin(int stn_x,int stn_y, Matrix<int>* basin,
                         basin->set(id,2,i); // 录入网格坐标
                         break;
                     }else if(x < 1 || x > ncol || y < 1
-                             || y > nrow || next_x->get(y,x)<=0)
+                             || y > nrow || next_x->get(y,x) == 0)
                         break;
                     else{
+
+                        for(int s = 0;s < 4; s++){
+                            prevxy[0][s] = prevxy[0][s+1];
+                            prevxy[1][s] = prevxy[1][s+1];
+                        }
+                        prevxy[0][4] = x;
+                        prevxy[1][4] = y;                  // 记录经过的网格坐标组成的队列用于探测回路。
+
                         int nx = next_x->get(y,x);
                         int ny = next_y->get(y,x);
+                        for(int s = 0; s < 5; s ++){
+                            if(nx == prevxy[0][s] && ny == prevxy[1][s]) {
+                                cout << "  Warning: circle detected at " << x << "," << y <<
+                                ". It will be set to zero.\n";
+                                next_x->set(y,x,0);
+                                next_y->set(y,x,0);
+                            }
+                        }                                   // 探测回路。
+
                         x = nx;
                         y = ny;
                     }
                 }
             }
+
     return id;
 }
 

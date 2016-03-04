@@ -24,7 +24,10 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
     double basin_area = 0.0;
     double basin_factor = 0.0;
 
+    int miss_sum = 0;
+
     string grid_path;
+
 
     for(int i = 1; i<= rout_days; i++) {
         flow[i] = 0.0;
@@ -50,10 +53,11 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
         ifstream fin;
         fin.open(grid_path.c_str());
         if(!fin.is_open()){
-            cout<<"    VIC output file "<<grid_path<<" not found.\n    corresponding value will be set to zero.\n";
+            cout<<"    Warning: VIC output file "<<grid_path<<" not found.\n    corresponding value will be set to zero.\n";
             for(int i = 1; i <= rout_days;i++) {
                 runo[i] = base[i] = 0.0;
             }
+            miss_sum++;
         }else{
             int sta;
 
@@ -62,7 +66,10 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             int year,month,day;
             double truno,tbase;
 
-            getline(fin,buf_line);  // 读取第一行
+            do{
+                getline(fin,buf_line);  // 读取并跳过注释行
+            }while(buf_line[0] == '#');
+
             sscanf(buf_line.c_str(),"%d %d %d",
                    &year,&month,&day);
             get_start.set_time(year,month,day);
@@ -78,7 +85,7 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }  // 挪至汇流开始日期对应行
 
             for(int i = 1; i <= rout_days; i++){
-                sta = sscanf(buf_line.c_str(),"%*d %*d %*d %*lf %*lf %lf %lf",&truno,&tbase);
+                sta = sscanf(buf_line.c_str(),"%*d %*d %*d %lf %lf",&truno,&tbase);
                 runo[i] = truno;
                 base[i] = tbase;
                 if(sta <2){
@@ -100,7 +107,8 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
                         *cos(la*PI/180)*sin(csize*PI/360);  // 计算网格面积
         basin_area += area;
 
-        double factor = fract->get(y,x) * 35.315 * area/(86400000.0);   // 计算产流量转换比例因子
+        double factor = fract->get(y,x) * area/(86400000.0);   // 计算产流量转换比例因子，产流比例乘径流深乘面积除以一天的秒数
+                                                               // 再除以1000转换毫米为米
         basin_factor += factor;
 
         for(int i = 1; i < rout_days; i++){
@@ -116,6 +124,10 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }
         }
 
+        if(n % (basin_sum/100) ==0)
+            cout<<"  - Grid "<<n<<"/"<<basin_sum<<" complete.\n";
     }
+    if(miss_sum > 0)
+        cout<<"    Warning: total "<<miss_sum<<" grids missed.\n";
     return basin_factor;
 }

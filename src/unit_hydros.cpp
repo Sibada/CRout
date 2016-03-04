@@ -52,24 +52,30 @@ void make_grid_UH(Matrix<double>* UH_grid,
                   Grid<int>* next_x,Grid<int>* next_y,
                   int stn_x, int stn_y){
 
-    double UH_daily [basin_sum + 1][DAY_UH+1];
-    double UH_hour [T_MAX+1][2];
+    double** UH_daily = new double*[basin_sum + 1];
+    for(int i = 1;i <= basin_sum; i++ ){
+        UH_daily[i] = new double[DAY_UH+1];
+    }
 
-
+    double* UH_hour[2];
+    UH_hour[0] = new double[T_MAX+1];
+    UH_hour[1] = new double[T_MAX+1];
 
 
     for(int n = 1;n <= basin_sum; n++){
+
+        cout<<"  ------Deal with "<<n<<" of "<<basin_sum<<endl;
 
         for(int i = 1;i <= DAY_UH; i++)
             UH_daily[n][i] = 0.0;
 
         for(int i = 1;i <= 24;i++){
-            UH_hour[i][0] = 1.0/24.0;
-            UH_hour[i][1] = 0.0;
+            UH_hour[0][i] = 1.0/24.0;
+            UH_hour[1][i] = 0.0;
         }
         for(int i = 25;i <= T_MAX; i++){
-            UH_hour[i][0] = 0.0;
-            UH_hour[i][1] = 0.0;
+            UH_hour[0][i] = 0.0;
+            UH_hour[1][i] = 0.0;
         }
 
         int x = basin->get(n, 1);
@@ -78,7 +84,7 @@ void make_grid_UH(Matrix<double>* UH_grid,
         while(true){
             for(int t = 1; t <= T_MAX; t++)
                 for(int l = 1; l <= LE; l++)
-                    if(t > l) UH_hour[t][1]+= UH_hour[t-l][0]*UH_m->get(l,x,y);
+                    if(t > l) UH_hour[1][t]+= UH_hour[0][t-l]*UH_m->get(l,x,y);
 
             if(x == stn_x && y == stn_y)break;
 
@@ -88,14 +94,14 @@ void make_grid_UH(Matrix<double>* UH_grid,
             y = ny;
 
             for(int i = 1; i <= T_MAX; i++){
-                UH_hour[i][0] = UH_hour[i][1];
-                UH_hour[i][1] = 0.0;
+                UH_hour[0][i] = UH_hour[1][i];
+                UH_hour[1][i] = 0.0;
             }
         }
 
         for(int t = 1; t <= T_MAX; t++){
             int st = (t + 23)/24;
-            UH_daily[n][st] += UH_hour[t][0];
+            UH_daily[n][st] += UH_hour[0][t];
         }
     }
 
@@ -120,6 +126,13 @@ void make_grid_UH(Matrix<double>* UH_grid,
         }
 
     }
+
+    for(int i = 1;i <= basin_sum; i++ ){
+        delete[] UH_daily[i];
+    }
+    delete[] UH_daily;
+    delete[] UH_hour[0];
+    delete[] UH_hour[1];
 }
 
 int write_UH_grid(string name ,Matrix<double>* UH_grid, Matrix<int>* basin,int basin_sum){

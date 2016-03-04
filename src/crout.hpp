@@ -21,6 +21,8 @@
 #define BASIN_MAX 16384
 #define T_MAX 2304   // DAY_UH * 24
 
+#ifdef DEFAULT
+#define DIREC_FORMAT "default"
 #define NW  1
 #define NEW 2
 #define EW  3
@@ -29,6 +31,18 @@
 #define SWW 6
 #define WW  7
 #define NWW 8
+#else
+#define DIREC_FORMAT "ArcInfo"
+#define NW  64
+#define NEW 128
+#define EW  1
+#define SEW 2
+#define SW  4
+#define SWW 8
+#define WW  16
+#define NWW 32
+
+#endif
 
 void make_nextgrid(Grid<int> *, Grid<int> *, Grid<int> *);
 

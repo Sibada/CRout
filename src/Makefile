@@ -17,6 +17,9 @@ CFLAGS = -I. -O3 -w
 # 调试用
 #CFLAGS = -I. -g -Wall
 
+ARCFLAGS = -DARCINFO
+
+DEFFLAGS = -DDEFAULT
 
 TARGET = crout
 
@@ -33,20 +36,24 @@ SRCS = crout.cpp \
 
 OBJS = $(SRCS:%.cpp=%.o) 
 
-
-
-
 all : 
 	make build
 	make link
 
-full :
-	make clean
-	make all
 
+arcinfo:
+	make arcbuild
+	make link
+	
+
+.PHONY : build
 build : $(SRCS) $(HEADS)
-	$(CXX) $(CFRAGS) -c $(SRCS)
+	$(CXX) $(CFRAGS) $(DEFFLAGS) -c $(SRCS)
 
+arcbuild : $(SRCS) $(HEADS)
+	$(CXX) $(CFRAGS) $(ARCFLAGS) -c $(SRCS)
+
+.PHONY : link
 link : $(OBJS)
 	$(CXX) $(CFLAGS) $(OBJS) -o $(TARGET)$(EXT)
 

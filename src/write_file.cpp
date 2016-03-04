@@ -15,6 +15,9 @@
 
 using namespace std;
 
+/**
+ * 按日输出模拟径流数据
+ */
 int write_file(double * flow, double basin_factor, const Time& start_date, int skip_days, int rout_days,string station_name, string out_path){
     string fd_path = out_path+station_name+".day";
     string fdmm_path = out_path+station_name+".day_mm";
@@ -43,6 +46,9 @@ int write_file(double * flow, double basin_factor, const Time& start_date, int s
     fdmm.close();
     return 0;
 }
+/**
+ * 按月份输出模拟径流数据
+ */
 
 int write_file_month(double * flow, double basin_factor, const Time& start_date, int skip_days, int rout_days,string station_name, string out_path){
     string fm_path = out_path+station_name+".month";
@@ -65,13 +71,14 @@ int write_file_month(double * flow, double basin_factor, const Time& start_date,
         month_avg += flow[i];
 
         if(date.get_day() == date.get_days_in_month()) {
+            double month_mm = month_avg / basin_factor;
             month_avg /= date.get_days_in_month();
 
             fm << date.get_year() << "\t" << date.get_month() << "\t"
             << month_avg<<endl;
 
             fmmm << date.get_year() << "\t" << date.get_month() << "\t"
-            << month_avg / basin_factor<<endl;
+            << month_mm<<endl;
             month_avg = 0.0;
         }
         date += 1;
