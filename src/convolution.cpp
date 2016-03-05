@@ -6,28 +6,27 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <math.h>
-#include <time.h>
 
 using namespace std;
 
 double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yll, double csize,
                       Matrix<double>* UH_grid,Grid<double>* fract,
-                      string vic_path,int prec,
+                      string vic_path,int prec, int runoff_col,
                       const Time& start_date, int rout_days,double* flow){
 
     int uhl = KE + DAY_UH - 1;
 
     double runo[rout_days + 1];
     double base[rout_days + 1];
-
     double basin_area = 0.0;
     double basin_factor = 0.0;
 
     int miss_sum = 0;
 
+    stringstream sst;
     string grid_path;
-
 
     for(int i = 1; i<= rout_days; i++) {
         flow[i] = 0.0;
@@ -43,21 +42,20 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
         double lon = get_lon(x,xll,csize);
         double la = get_la(y,yll,csize);
 
-
-        /** 读入VIC输出数据 **/
-
         char path_prefix[32];
         sprintf(path_prefix,vicfile_format,la,lon);
         grid_path = vic_path + path_prefix;
 
+        /** ******************************************************************************** 读入VIC输出数据 ************/
         ifstream fin;
         fin.open(grid_path.c_str());
         if(!fin.is_open()){
-            cout<<"    Warning: VIC output file "<<grid_path<<" not found.\n    corresponding value will be set to zero.\n";
+            cout<<"    Warning: VIC output file "<<grid_path<<" not found.\n     corresponding value will be set to zero.\n";
             for(int i = 1; i <= rout_days;i++) {
                 runo[i] = base[i] = 0.0;
             }
             miss_sum++;
+
         }else{
             int sta;
 
@@ -72,35 +70,40 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
 
             sscanf(buf_line.c_str(),"%d %d %d",
                    &year,&month,&day);
-            get_start.set_time(year,month,day);
+            get_start.set_time(year, month, day);
 
             if(get_start > start_date){
                 cout<<"  Error: Routing begin date"<<start_date<<" earlier than VIC output begin date "<<get_start<<endl;
                 exit(1);
             }
 
-            int sc = start_date - get_start;
+            int sc = start_date - get_start;  // 挪至汇流开始日期对应行
             for(int i = 0;i < sc; i++) {
                 getline(fin,buf_line);
-            }  // 挪至汇流开始日期对应行
+            }
 
-            for(int i = 1; i <= rout_days; i++){
-                sta = sscanf(buf_line.c_str(),"%*d %*d %*d %lf %lf",&truno,&tbase);
-                runo[i] = truno;
-                base[i] = tbase;
-                if(sta <2){
-                    cout<<"  Error: VIC output file format incorrect.\n";
-                    exit(1);
-                }
-                getline(fin,buf_line);
-                if(fin.eof()) {
-                    if(i < rout_days){
-                        cout<<"  Error: VIC output data is not enough.\n";
+            for(int i = 1; i <= rout_days; i++){    // 读取每一行数据
+                sst.clear();
+                sst << buf_line;
+                for(int k = 0; k < runoff_col; k++) {
+                    sst >> truno;
+                    if(sst.fail()){
+                        cout<<"  Error: VIC output file format incorrect at "<<grid_path<<"\n";
                         exit(1);
                     }
                 }
-            }
+                sst >> tbase;
+                runo[i] = truno;
+                base[i] = tbase;
+
+                getline(fin,buf_line);
+                if(fin.eof() && i < rout_days) {
+                        cout<<"  Error: VIC output data is not enough.\n";
+                        exit(1);
+                }
+            }    // 读取每一行数据
         }
+        /** ********************************************************************** 到这里为止都是读入数据的 **************/
 
         /** 汇流计算 **/
         double area = 2 *(csize*PI/180)*EARTH_RADI*EARTH_RADI
@@ -124,7 +127,7 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }
         }
 
-        if(n % (basin_sum/100) ==0)
+        if(basin_sum <= 100 || n % (basin_sum/100) == 0)
             cout<<"  - Grid "<<n<<"/"<<basin_sum<<" complete.\n";
     }
     if(miss_sum > 0)

@@ -23,6 +23,10 @@
  * 16-03-04 0.13
  * 修改了部分文件数据读入方式，输出流量数据单位改为立方米每秒，
  * 增加了按流向数据编码方式为原版以及ArcInfo形式的编译选项
+ *
+ * 16-03-05 0.14
+ * 新增了可设定VIC文件中产流数据所在列数的功能，修复了点bug
+ *
  */
 
 using namespace std;
@@ -76,6 +80,7 @@ int main(int argc, char *argv[]){
     string UHslo_path;
 
     int prec = 4;   // VIC输出文件坐标小数位数
+    int runoff_col; // VIC输出文件产流数据在第几列
 
     double veloc_default,diffu_default = 0.0;
     double fract_default,distan_default = 0.0;
@@ -198,7 +203,9 @@ int main(int argc, char *argv[]){
     getline(fin,line);
     prec = atoi(line.c_str());  //VIC输出文件坐标小数位数
     cout << "  VIC output path \t" << vic_path << "     " << prec << " decimal places.\n";
-
+    getline(fin,line);
+    runoff_col = atoi(line.c_str());
+    cout << "  --Runoff data at column "<<runoff_col<<" and "<<runoff_col +1 << endl;
 
     do{
         getline(fin, line);
@@ -404,7 +411,7 @@ int main(int argc, char *argv[]){
         double flow[rout_days + 1];
         double basin_factor =
                 make_convolution(basin, basin_sum, xll, yll, csize, UH_grid, fract,
-                                 vic_path, prec, begin_date, rout_days, flow);
+                                 vic_path, prec, runoff_col, begin_date, rout_days, flow);
 
         cout<<"  -> Writing routing simulation data...\n";
         write_file(flow, basin_factor, start_date,out_skip_days, rout_days, station_name, out_path);

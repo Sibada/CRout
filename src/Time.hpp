@@ -303,6 +303,7 @@ private:
     void __days_to_ymd(){
         // 计算年份
         year = total_days/365.2425;
+        if(year*365.2425 == total_days)year -= 1;
         int y400 = year/400;
         int yresi = year - y400*400;
         int y100 = yresi/100;

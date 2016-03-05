@@ -83,7 +83,7 @@ int read_UH_grid(string filename, Matrix<double>* UH_grid, Matrix<int>* basin);
  */
 double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yll, double csize,
                         Matrix<double>* UH_grid,Grid<double>* fract,
-                        string vic_path,int prec,
+                        string vic_path,int prec, int runoff_col,
                         const Time& start_date, int rout_days,double* flow);
 
 /**

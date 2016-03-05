@@ -27,7 +27,7 @@
 *.out
 *.app
 
-# 其他乱入
+# 各种其他乱入
 *.*~
 .idea/
 build/
@@ -38,6 +38,7 @@ build/
 
 *.uh_s
 crout
+*~
 
 # =========================
 # Operating System Files

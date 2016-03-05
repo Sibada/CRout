@@ -45,26 +45,27 @@ void make_UHm(Matrix<double>* UH_m,
 
 }
 
-
+/**
+ * 生成站点单位线数据
+ *
+ */
 void make_grid_UH(Matrix<double>* UH_grid,
                   Matrix<int>* basin, int basin_sum,
                   Matrix<double>* UH_m, double* UH_slope,
                   Grid<int>* next_x,Grid<int>* next_y,
                   int stn_x, int stn_y){
 
+    // 初始化内存空间
     double** UH_daily = new double*[basin_sum + 1];
     for(int i = 1;i <= basin_sum; i++ ){
         UH_daily[i] = new double[DAY_UH+1];
     }
-
     double* UH_hour[2];
     UH_hour[0] = new double[T_MAX+1];
     UH_hour[1] = new double[T_MAX+1];
 
-
+    // 处理流域内每个网格
     for(int n = 1;n <= basin_sum; n++){
-
-        cout<<"  ------Deal with "<<n<<" of "<<basin_sum<<endl;
 
         for(int i = 1;i <= DAY_UH; i++)
             UH_daily[n][i] = 0.0;
@@ -103,10 +104,15 @@ void make_grid_UH(Matrix<double>* UH_grid,
             int st = (t + 23)/24;
             UH_daily[n][st] += UH_hour[0][t];
         }
+
+        // 输出处理进度信息。
+        if(basin_sum <= 100 || n % (basin_sum/100) == 0)
+            cout<<"  ------ "<<n<<" of "<<basin_sum<<" complete.\n";
     }
 
     UH_grid->set_all(0.0);
 
+    // 标准化单位线
     for(int n = 1; n<= basin_sum; n++){
 
         for(int j = 1; j <= KE; j++){
@@ -127,6 +133,7 @@ void make_grid_UH(Matrix<double>* UH_grid,
 
     }
 
+    // 清理内存
     for(int i = 1;i <= basin_sum; i++ ){
         delete[] UH_daily[i];
     }
@@ -135,6 +142,10 @@ void make_grid_UH(Matrix<double>* UH_grid,
     delete[] UH_hour[1];
 }
 
+/**
+ * 将站点单位线数据写入文件
+ *
+ */
 int write_UH_grid(string name ,Matrix<double>* UH_grid, Matrix<int>* basin,int basin_sum){
     ofstream fout;
     string filename = name +".uh_s";
