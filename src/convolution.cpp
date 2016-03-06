@@ -83,8 +83,8 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }
 
             for(int i = 1; i <= rout_days; i++){    // 读取每一行数据
-                sst.clear();
-                sst << buf_line;
+
+                sst.str(buf_line);
                 for(int k = 0; k < runoff_col; k++) {
                     sst >> truno;
                     if(sst.fail()){
@@ -119,7 +119,7 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             base[i] *= factor;
         }
 
-        /** 产流量乘以单位线条 **/
+        /** 产流量乘以单位线 **/
         for(int i = 1; i<= rout_days; i++){
             for(int j = 1; j<= uhl; j++){
                 if( i > j )

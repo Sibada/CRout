@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 
     // debug用
 //    ifstream fin;
-//    fin.open("/home/victi/rout/p_ins.input");
+//    fin.open("/home/victi/rout/p_ins_r.input");
 
     ofstream olog;
     if(argc > 2) {
