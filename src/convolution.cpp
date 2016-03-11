@@ -83,8 +83,9 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }
 
             for(int i = 1; i <= rout_days; i++){    // 读取每一行数据
-
-                sst.str(buf_line);
+                sst.clear();
+                sst.str("");
+                sst << buf_line;
                 for(int k = 0; k < runoff_col; k++) {
                     sst >> truno;
                     if(sst.fail()){

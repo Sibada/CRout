@@ -47,8 +47,9 @@ int main(int argc, char *argv[]){
     }
 
     // debug用
+
 //    ifstream fin;
-//    fin.open("/home/victi/rout/p_ins_r.input");
+//    fin.open("/home/victi/rout/p1.input");
 
     ofstream olog;
     if(argc > 2) {
@@ -305,16 +306,6 @@ int main(int argc, char *argv[]){
         }
     }
 
-//    if(distan_path == "F")
-//        distan->set_all(nrow,ncol,distan_default);
-//    else{
-//        sta = distan->read_file(distan_path); // 流程数据
-//        if(sta != 0){
-//            cout << "  Error: xmask file not found.\n";
-//            exit(1);
-//        }
-//    }
-
     if(fract_path == "F") {
         fract->set_all(nrow,ncol,fract_default);
     }
@@ -413,15 +404,14 @@ int main(int argc, char *argv[]){
                 make_convolution(basin, basin_sum, xll, yll, csize, UH_grid, fract,
                                  vic_path, prec, runoff_col, begin_date, rout_days, flow);
 
-        cout<<"  -> Writing routing simulation data...\n";
+        cout<<"  -> Writing routing simulation data per day...\n";
         write_file(flow, basin_factor, start_date,out_skip_days, rout_days, station_name, out_path);
+        cout<<"  -> Writing routing simulation data per month...\n";
         write_file_month(flow, basin_factor, start_date, out_skip_days,rout_days, station_name, out_path);
 
     } // 站点处理循环结束。
 
     fin.close();
-    if(olog.is_open())
-        olog.close();   // 关闭文件流。
 
     delete direc;
     delete veloc;
@@ -438,5 +428,7 @@ int main(int argc, char *argv[]){
     time( &ed_time);
 
     cout<<"  Done. ("<<ed_time - st_time <<"s costs)\n";
+    if(olog.is_open())
+        olog.close();   // 关闭Log文件流。
     return 0;
 }
