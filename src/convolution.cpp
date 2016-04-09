@@ -57,12 +57,12 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             miss_sum++;
 
         }else{
-            int sta;
 
             string buf_line;
             Time get_start;
             int year,month,day;
             double truno,tbase;
+            int sta;
 
             do{
                 getline(fin,buf_line);  // 读取并跳过注释行
@@ -78,7 +78,7 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }
 
             int sc = start_date - get_start;  // 挪至汇流开始日期对应行
-            for(int i = 0;i < sc; i++) {
+            for(int i = 0;i < sta; i++) {
                 getline(fin,buf_line);
             }
 
