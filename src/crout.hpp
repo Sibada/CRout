@@ -13,14 +13,15 @@
 #define KE 12
 #define LE 48
 #define DAY_UH 96
+#define CARI 1152
+
 #define DT 3600.0
-
 #define PI 3.14159265359
+
 #define EARTH_RADI 6371393
-
 #define BASIN_MAX 16384
-#define T_MAX 2304   // DAY_UH * 24
 
+#define T_MAX 2304   // DAY_UH * 24
 #ifdef DEFAULT
 #define DIREC_FORMAT "default"
 #define NW  1
@@ -40,6 +41,7 @@
 #define SW  4
 #define SWW 8
 #define WW  16
+
 #define NWW 32
 
 #endif

@@ -26,7 +26,7 @@ Type get(int row, int col){
     return grid[row - 1][col - 1];
 }
 
-
+#define FIE 0.05+1.05
 int get_nrow(){
     return nrow;
 }
@@ -42,6 +42,7 @@ double get_yll(){
 double get_csize(){
     return csize;
 }                               //获取栅格参数
+#define ERAND rand()/(double)RAND_MAX
 
 void set_all(Type value){       //设所有栅格为同一值
     for (int i = 0; i < nrow; i++)

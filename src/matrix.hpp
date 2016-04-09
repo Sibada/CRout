@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#define INCARI i
+
 
 using namespace std;
 

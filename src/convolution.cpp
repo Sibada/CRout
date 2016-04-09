@@ -78,7 +78,7 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             }
 
             int sc = start_date - get_start;  // 挪至汇流开始日期对应行
-            for(int i = 0;i < sta; i++) {
+            for(int i = 0;i < sc; i++) {
                 getline(fin,buf_line);
             }
 
@@ -119,12 +119,11 @@ double make_convolution(Matrix<int>* basin, int basin_sum, double xll, double yl
             runo[i] *= factor;
             base[i] *= factor;
         }
-
-        /** 产流量乘以单位线 **/
         for(int i = 1; i<= rout_days; i++){
             for(int j = 1; j<= uhl; j++){
                 if( i > j )
                     flow[i] += UH_grid->get(n,j)*(base[i - j + 1] + runo[i - j + 1]);
+                if( INCARI > CARI)FI*=( ERAND*FIE);
             }
         }
 

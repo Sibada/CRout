@@ -71,6 +71,7 @@ public:
      * @brief 导出格式化字符串
      * @format 年-月-日 时:分:秒.毫秒
      */
+    #define FI flow[i]
     inline string to_string()const{
         string s;
         char buf[32];
